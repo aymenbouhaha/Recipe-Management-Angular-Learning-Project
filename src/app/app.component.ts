@@ -1,5 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {AuthService} from "./auth/auth.service";
+import {Store} from "@ngrx/store";
+import * as fromApp from './store/app.reducer'
+import * as AuthActions from './auth/store/auth.actions'
+import {isPlatformBrowser} from "@angular/common";
 
 @Component({
   selector: 'app-root',
@@ -9,11 +13,15 @@ import {AuthService} from "./auth/auth.service";
 export class AppComponent implements OnInit{
   title = 'recipe-shopping';
 
-  constructor( private authService:AuthService) {
-    this.authService.autoLogin()
+  constructor(private store : Store<fromApp.AppState>,@Inject(PLATFORM_ID) private platformId) {
   }
-  ngOnInit(): void {
 
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)){
+      this.store.dispatch(
+        new AuthActions.AutoLogin()
+      )
+    }
   }
   // recipeObserved : boolean=true
   //
@@ -21,6 +29,12 @@ export class AppComponent implements OnInit{
   //   this.recipeObserved=recipeObserved
   // }
 
+
+  //Different Approach #999
+
+  // constructor( private authService:AuthService) {
+  //   this.authService.autoLogin()
+  // }
 
 
 }

@@ -4,6 +4,9 @@ import {RecipeService} from "../recipe.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {DataStorageService} from "../../shared/data-storage.service";
 import {Subscription} from "rxjs/Subscription";
+import {Store} from "@ngrx/store";
+import * as fromApp from '../../store/app.reducer'
+import * as RecipeActions from '../store/recipe.actions'
 
 @Component({
   selector: 'app-recipe-list',
@@ -18,19 +21,27 @@ export class RecipeListComponent implements OnInit , OnDestroy {
 
   isLoading : boolean = false
 
-  constructor(private recipeService : RecipeService , private router : Router, private dataStorageService: DataStorageService) { }
+  constructor(private recipeService : RecipeService , private router : Router, private dataStorageService: DataStorageService , private store: Store<fromApp.AppState>) { }
 
   ngOnInit(): void {
-    this.isLoading=true
-    this.dataStorageService.fetchingData().subscribe()
-    this.subscription = this.recipeService.recipesChanged
-      .subscribe(
-        (recipes : Recipe[])=>{
-          this.recipes=recipes
-          this.isLoading=false
-        }
-      )
-    this.recipes=this.recipeService.getRecipes()
+    // this.isLoading=true
+    // this.store.dispatch(
+    //   new RecipeActions.FetchData()
+    // )
+    this.subscription=this.store.select('recipes').subscribe(
+      (recipeState)=>{
+        this.recipes=recipeState.recipes
+        this.isLoading=false
+      }
+    )
+    // this.subscription = this.recipeService.recipesChanged
+    //   .subscribe(
+    //     (recipes : Recipe[])=>{
+    //       this.recipes=recipes
+    //       this.isLoading=false
+    //     }
+    //   )
+    // this.recipes=this.recipeService.getRecipes()
   }
 
   navigateToNewRecipe(){
